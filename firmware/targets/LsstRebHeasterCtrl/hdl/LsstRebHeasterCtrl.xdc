@@ -1,0 +1,26 @@
+##############################################################################
+## This file is part of 'LSST Firmware'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'LSST Firmware', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+
+###########################################################################################
+
+# set_property -dict { PACKAGE_PIN XXX} [get_ports { ethClkP}]
+# set_property -dict { PACKAGE_PIN XXX} [get_ports { ethClkN}]
+
+# set_property -dict { PACKAGE_PIN XXX } [get_ports { ethTxP[0]}]
+# set_property -dict { PACKAGE_PIN XXX } [get_ports { ethTxN[0]}]
+# set_property -dict { PACKAGE_PIN XXX } [get_ports { ethRxP[0]}]
+# set_property -dict { PACKAGE_PIN XXX } [get_ports { ethRxN[0]}]
+
+# set_property -dict { PACKAGE_PIN XXX } [get_ports { ethTxP[1]}]
+# set_property -dict { PACKAGE_PIN XXX } [get_ports { ethTxN[1]}]
+# set_property -dict { PACKAGE_PIN XXX } [get_ports { ethRxP[1]}]
+# set_property -dict { PACKAGE_PIN XXX } [get_ports { ethRxN[1]}]
+
+###########################################################################################

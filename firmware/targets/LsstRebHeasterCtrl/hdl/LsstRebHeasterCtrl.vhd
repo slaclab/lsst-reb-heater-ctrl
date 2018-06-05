@@ -2,7 +2,7 @@
 -- File       : LsstRebHeasterCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-04-05
--- Last update: 2018-04-05
+-- Last update: 2018-06-04
 -------------------------------------------------------------------------------
 -- Description: Firmware Target's Top Level
 -------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ end LsstRebHeasterCtrl;
 
 architecture top_level of LsstRebHeasterCtrl is
 
-   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(6 downto 0) := genAxiLiteConfig(7, x"0000_0000", 22, 18);
+   constant AXI_XBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(8 downto 0) := genAxiLiteConfig(9, x"0000_0000", 22, 18);
 
    signal axilClk          : sl;
    signal axilRst          : sl;
@@ -56,9 +56,10 @@ begin
    ---------------------
    U_Core : entity work.LsstPwrCtrlCore
       generic map (
-         TPD_G        => TPD_G,
-         NUM_LANE_G   => 2,
-         BUILD_INFO_G => BUILD_INFO_G)
+         TPD_G             => TPD_G,
+         NUM_LANE_G        => 2,
+         AXI_XBAR_CONFIG_G => AXI_XBAR_CONFIG_C,
+         BUILD_INFO_G      => BUILD_INFO_G)
       port map (
          -- Register Interface
          axilClk          => axilClk,

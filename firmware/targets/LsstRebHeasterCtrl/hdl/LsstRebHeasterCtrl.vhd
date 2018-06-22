@@ -2,7 +2,7 @@
 -- File       : LsstRebHeasterCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-04-05
--- Last update: 2018-06-04
+-- Last update: 2018-06-22
 -------------------------------------------------------------------------------
 -- Description: Firmware Target's Top Level
 -------------------------------------------------------------------------------
@@ -27,20 +27,26 @@ entity LsstRebHeasterCtrl is
       BUILD_INFO_G : BuildInfoType);
    port (
       -- 1GbE Ports
-      ethClkP : in  sl;
-      ethClkN : in  sl;
-      ethRxP  : in  slv(1 downto 0);
-      ethRxN  : in  slv(1 downto 0);
-      ethTxP  : out slv(1 downto 0);
-      ethTxN  : out slv(1 downto 0);
+      ethClkP  : in  sl;
+      ethClkN  : in  sl;
+      ethRxP   : in  slv(1 downto 0);
+      ethRxN   : in  slv(1 downto 0);
+      ethTxP   : out slv(1 downto 0);
+      ethTxN   : out slv(1 downto 0);
+      -- Boot Memory Ports
+      bootCsL  : out sl;
+      bootMosi : out sl;
+      bootMiso : in  sl;
+      bootWpL  : out sl;
+      bootHdL  : out sl;
       -- XADC Ports
-      vPIn    : in  sl;
-      vNIn    : in  sl);
+      vPIn     : in  sl;
+      vNIn     : in  sl);
 end LsstRebHeasterCtrl;
 
 architecture top_level of LsstRebHeasterCtrl is
 
-   constant AXI_XBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(8 downto 0) := genAxiLiteConfig(9, x"0000_0000", 22, 18);
+   constant AXI_XBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(9 downto 0) := genAxiLiteConfig(10, x"0000_0000", 22, 18);
 
    signal axilClk          : sl;
    signal axilRst          : sl;
@@ -73,6 +79,12 @@ begin
          -- XADC Ports
          vPIn             => vPIn,
          vNIn             => vNIn,
+         -- Boot Memory Ports
+         bootCsL          => bootCsL,
+         bootMosi         => bootMosi,
+         bootMiso         => bootMiso,
+         bootWpL          => bootWpL,
+         bootHdL          => bootHdL,
          -- 1GbE Interface
          ethClkP          => ethClkP,
          ethClkN          => ethClkN,

@@ -21,5 +21,7 @@ target: prom
 # Edit this for each target
 export PRJ_PART = xc7a100tfgg484-3
 
+export OVERRIDE_SUBMODULE_LOCKS = 1
+
 # Use top level makefile
 include ../../submodules/ruckus/system_vivado.mk

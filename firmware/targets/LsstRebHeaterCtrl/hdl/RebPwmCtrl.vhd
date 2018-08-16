@@ -129,17 +129,17 @@ begin
 
       for i in 0 to 11 loop
          axiSlaveRegister(axilEp, toSlv(i*4, 8), 0, v.highCountTmp(i));
-         axiSlaveRegister(axilEp, toSlv(i*4, 8), 8, v.lowCountTmp(i));
-         axiSlaveRegister(axilEp, toSlv(i*4, 8), 16, v.delayCountTmp(i));
-         axiSlaveRegister(axilEp, toSlv(i*4, 8), 24, v.outputEn(i));
+         axiSlaveRegister(axilEp, toSlv(i*4, 8), 9, v.lowCountTmp(i));
+         axiSlaveRegister(axilEp, toSlv(i*4, 8), 18, v.delayCountTmp(i));
+         axiSlaveRegister(axilEp, toSlv(i*4, 8), 27, v.outputEn(i));
          axiSlaveRegister(axilEp, toSlv(i*4, 8), 31, v.channelChanged(i), '1');
       end loop;
 
       -- Readback registers for sanity checking
       for i in 0 to 11 loop
          axiSlaveRegisterR(axilEp, toSlv((i+12)*4, 8), 0, r.highCount(i));
-         axiSlaveRegisterR(axilEp, toSlv((i+12)*4, 8), 8, r.lowCount(i));
-         axiSlaveRegisterR(axilEp, toSlv((i+12)*4, 8), 16, r.delayCount(i));
+         axiSlaveRegisterR(axilEp, toSlv((i+12)*4, 8), 9, r.lowCount(i));
+         axiSlaveRegisterR(axilEp, toSlv((i+12)*4, 8), 18, r.delayCount(i));
       end loop;
 
       axiSlaveDefault(axilEp, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);

@@ -66,9 +66,7 @@ class RebHeaterChannel(pr.Device):
             name = 'Frequency',
             mode = 'RW',
             units = 'kHz',
-            minimum = 400,
-            maximum = 2000,
-            value = 500,
+            #value = 500,
             dependencies = deps,
             linkedGet = lambda: 1.0e-3 / (BASE_PERIOD * (2+self.HighCount.value()+self.LowCount.value())),
             linkedSet = setFreq))
@@ -78,9 +76,7 @@ class RebHeaterChannel(pr.Device):
             mode = 'RW',
             units = 'frac-high',
             disp = '{:1.2f}',
-            minimum = 0.0,
-            maximum = 1.0,
-            value = .5,
+            #value = .5,
             dependencies = deps,
             linkedGet = lambda: ((self.HighCount.value()+1) / (self.HighCount.value() + self.LowCount.value() + 2)),
             linkedSet = setDuty))
@@ -92,6 +88,35 @@ class RebHeaterChannel(pr.Device):
             dependencies = deps,
             linkedGet = lambda: ((self.DelayCount.value()) * 360) / (self.HighCount.value() + self.LowCount.value() + 2),
             linkedSet = lambda value: self.DelayCount.set(int(value / 360) * (self.HighCount.value() + self.LowCount.value() + 2))))
+
+        self.add(pr.RemoteVariable(
+            name = 'HighCountRB',
+            mode = 'RO',
+            disp = '{:d}',
+            offset = 0xc,
+            bitOffset = 0,
+            bitSize = 9,
+            base = pr.UInt))
+
+        self.add(pr.RemoteVariable(
+            name = 'LowCountRB',
+            mode = 'RO',
+            disp = '{:d}',
+            offset = 0xc,
+            bitOffset = 9,
+            bitSize = 9,
+            base = pr.UInt))
+
+        self.add(pr.RemoteVariable(
+            name = 'DelayCountRb',
+            mode = 'RO',
+            disp = '{:d}',
+            offset = 0xc,
+            bitOffset = 18,
+            bitSize = 9,
+            base = pr.UInt))
+        
+
 
 
 class RebPwmCtrl(pr.Device):

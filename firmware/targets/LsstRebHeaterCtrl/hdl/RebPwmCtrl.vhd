@@ -113,20 +113,21 @@ begin
       if (r.syncPulse = '1') then
          for i in 0 to 11 loop
             if (r.channelChanged(i) = '1') then
-               v.highCount(i)  := r.highCountTmp(i);
-               v.lowCount(i)   := r.lowCountTmp(i);
-               v.delayCount(i) := r.delayCountTmp(i);
-               v.clkDivRst(i)  := '1';
+               v.highCount(i)      := r.highCountTmp(i);
+               v.lowCount(i)       := r.lowCountTmp(i);
+               v.delayCount(i)     := r.delayCountTmp(i);
+               v.clkDivRst(i)      := '1';
+               v.channelChanged(i) := '0';
             end if;
          end loop;
       end if;
 
       -- Keep pwms off by holding in resent when outputEn = 0
-      for i in 0 to 11 loop
-         if (r.outputEn(i) = '0') then
-            v.clkDivRst(i) := '1';
-         end if;
-      end loop;
+--       for i in 0 to 11 loop
+--          if (r.outputEn(i) = '0') then
+--             v.clkDivRst(i) := '1';
+--          end if;
+--       end loop;
 
 
       ----------------------------------------------------------------------------------------------

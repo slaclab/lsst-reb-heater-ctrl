@@ -61,8 +61,8 @@ architecture rtl of RebPwmCtrl is
 
    constant REG_INIT_C : RegType := (
       clkDivRst      => (others => '0'),
-      highCount      => (others => (others => '0')),
-      lowCount       => (others => (others => '0')),
+      highCount      => toSlv(249, 9),
+      lowCount       => toslv(249, 9),
       delayCount     => (others => (others => '0')),
       highCountTmp   => (others => (others => '0')),
       lowCountTmp    => (others => (others => '0')),
@@ -120,6 +120,13 @@ begin
             end if;
          end loop;
       end if;
+
+      -- Keep pwms off by holding in resent when outputEn = 0
+      for i in 0 to 11 loop
+         if (r.outputEn(i) = '0') then
+            v.clkDivRst(i) := '1';
+         end if;
+      end loop;
 
 
       ----------------------------------------------------------------------------------------------

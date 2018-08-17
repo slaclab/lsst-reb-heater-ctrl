@@ -61,8 +61,8 @@ architecture rtl of RebPwmCtrl is
 
    constant REG_INIT_C : RegType := (
       clkDivRst      => (others => '0'),
-      highCount      => toSlv(249, 9),
-      lowCount       => toslv(249, 9),
+      highCount      => (others => toSlv(249, 9)),
+      lowCount       => (others => toslv(249, 9)),
       delayCount     => (others => (others => '0')),
       highCountTmp   => (others => (others => '0')),
       lowCountTmp    => (others => (others => '0')),

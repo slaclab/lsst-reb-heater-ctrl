@@ -115,19 +115,20 @@ class LsstRebHeaterCtrl(pr.Device):
         for i in range(12):
             self.add(i2c.Ltc2945(
                 name = f'Ltc2945[{i}]',
+                enabled = False,
                 offset = lsst.AXIL_OFFSETS[1] + (i * 0x1000),
                 shunt = 0.02
             ))
 
         
 class LsstRebHeaterCtrlRoot(lsst.LsstPwrCtrlRoot):
-    def __init__(self, **kwargs):
-        super().__init__(hwEmu = True, **kwargs)
+    def __init__(self, pollEn=False, **kwargs):
+        super().__init__(**kwargs)
 
         self.add(LsstRebHeaterCtrl(
             memBase = self.srp))
 
-        self.start()
+        self.start(pollEn=pollEn)
 
     
     

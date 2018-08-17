@@ -19,7 +19,11 @@ set_property -dict { PACKAGE_PIN T19 IOSTANDARD LVCMOS33 } [get_ports { bootCsL}
 set_property -dict { PACKAGE_PIN F10} [get_ports { ethClkP}]
 set_property -dict { PACKAGE_PIN E10} [get_ports { ethClkN}]
 
-#create_clock -name ethClk -period 8.000 [get_ports {ethClkP}]
+create_generated_clock -name clk200 [get_pins {U_ClockManager7_1/MmcmGen.U_Mmcm/CLKOUT0}]
+
+set_clock_groups -asynchronous \ 
+-group [get_clocks {axilClk}] \
+    -group [get_clocks {clk200}]
 
 set_property -dict { PACKAGE_PIN B4  } [get_ports { ethTxP[0]}]
 set_property -dict { PACKAGE_PIN A4  } [get_ports { ethTxN[0]}]

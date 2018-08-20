@@ -45,14 +45,14 @@ architecture rtl of RebPwmCtrl is
 
    type RegType is record
       clkDivRst      : slv(11 downto 0);
-      highCount      : slv8Array(11 downto 0);
-      lowCount       : slv8Array(11 downto 0);
-      delayCount     : slv8Array(11 downto 0);
-      highCountTmp   : slv8Array(11 downto 0);
-      lowCountTmp    : slv8Array(11 downto 0);
-      delayCountTmp  : slv8Array(11 downto 0);
+      highCount      : slv9Array(11 downto 0);
+      lowCount       : slv9Array(11 downto 0);
+      delayCount     : slv9Array(11 downto 0);
+      highCountTmp   : slv9Array(11 downto 0);
+      lowCountTmp    : slv9Array(11 downto 0);
+      delayCountTmp  : slv9Array(11 downto 0);
       channelChanged : slv(11 downto 0);
-      syncCount      : slv(7 downto 0);
+      syncCount      : slv(11 downto 0);
       syncPulse      : sl;
       outputEn       : slv(11 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
@@ -64,8 +64,8 @@ architecture rtl of RebPwmCtrl is
       highCount      => (others => toSlv(249, 9)),
       lowCount       => (others => toslv(249, 9)),
       delayCount     => (others => (others => '0')),
-      highCountTmp   => (others => (others => '0')),
-      lowCountTmp    => (others => (others => '0')),
+      highCountTmp   => (others => toSlv(249, 9)),
+      lowCountTmp    => (others => toSlv(249, 9)),
       delayCountTmp  => (others => (others => '0')),
       channelChanged => (others => '0'),
       syncCount      => (others => '0'),
@@ -83,7 +83,7 @@ begin
       U_ClockDivider_1 : entity work.ClockDivider
          generic map (
             TPD_G         => TPD_G,
-            COUNT_WIDTH_G => 8)
+            COUNT_WIDTH_G => 9)
          port map (
             clk        => clk200,           -- [in]
             rst        => r.clkDivRst(i),   -- [in]

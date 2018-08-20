@@ -2,7 +2,7 @@
 -- File       : LsstRebHeaterCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-04-05
--- Last update: 2018-08-17
+-- Last update: 2018-08-20
 -------------------------------------------------------------------------------
 -- Description: Firmware Target's Top Level
 -------------------------------------------------------------------------------
@@ -27,7 +27,8 @@ use unisim.vcomponents.all;
 
 entity LsstRebHeaterCtrl is
    generic (
-      TPD_G        : time := 1 ns;
+      TPD_G        : time    := 1 ns;
+      SIMULATION_G : boolean := false;
       BUILD_INFO_G : BuildInfoType);
    port (
       -- 1GbE Ports
@@ -126,6 +127,7 @@ begin
    U_Core : entity work.LsstPwrCtrlCore
       generic map (
          TPD_G             => TPD_G,
+         SIMULATION_G      => SIMULATION_G,
          NUM_LANE_G        => 2,
          AXI_XBAR_CONFIG_G => AXI_XBAR_CONFIG_C,
          BUILD_INFO_G      => BUILD_INFO_G)
@@ -167,7 +169,7 @@ begin
          TPD_G              => TPD_G,
          TYPE_G             => "MMCM",
          INPUT_BUFG_G       => false,
-         FB_BUFG_G          => false,
+         FB_BUFG_G          => true,
          OUTPUT_BUFG_G      => true,
          NUM_CLOCKS_G       => 1,
          CLKIN_PERIOD_G     => 8.0,

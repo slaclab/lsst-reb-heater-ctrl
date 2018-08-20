@@ -93,7 +93,7 @@ class RebHeaterChannel(pr.Device):
             name = 'HighCountRB',
             mode = 'RO',
             disp = '{:d}',
-            offset = 0xc,
+            offset = 0x4,
             bitOffset = 0,
             bitSize = 9,
             base = pr.UInt))
@@ -102,7 +102,7 @@ class RebHeaterChannel(pr.Device):
             name = 'LowCountRB',
             mode = 'RO',
             disp = '{:d}',
-            offset = 0xc,
+            offset = 0x4,
             bitOffset = 9,
             bitSize = 9,
             base = pr.UInt))
@@ -111,7 +111,7 @@ class RebHeaterChannel(pr.Device):
             name = 'DelayCountRb',
             mode = 'RO',
             disp = '{:d}',
-            offset = 0xc,
+            offset = 0x4,
             bitOffset = 18,
             bitSize = 9,
             base = pr.UInt))
@@ -125,7 +125,7 @@ class RebPwmCtrl(pr.Device):
         for i in range(12):
             self.add(RebHeaterChannel(
                 name = f'Channel[{i}]',
-                offset = i*4))
+                offset = i*8))
                 
 
 class LsstRebHeaterCtrl(pr.Device):

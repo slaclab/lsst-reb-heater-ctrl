@@ -79,19 +79,28 @@ begin
       wait until rst200 = '1';
       wait until rst200 = '0';
       wait until clk200 = '1';
-      wait for 10 us;
+      wait for 40 us;
       wait until clk200 = '1';
       data(8 downto 0) := "001111000";
       data(17 downto 9) := "001111000";
       data(26 downto 18) := "000010000";
       axiLiteBusSimWrite(clk200, axilWriteMaster, axilWriteSlave, addr, data, true);
-
+      wait until clk200 = '1';
       
       wait until clk200 = '1';
-      addr := X"00000004";
+      addr := X"00000008";
       data(26 downto 18) := "000000000";
       axiLiteBusSimWrite(clk200, axilWriteMaster, axilWriteSlave, addr, data, true);
-      wait until clk200 = '1';      
+      wait until clk200 = '1';
+      addr := X"00000004";
+      axiLiteBusSimRead(clk200, axilReadMaster, axilReadSlave, addr, data, true);
+      addr := X"0000000C";
+      axiLiteBusSimRead(clk200, axilReadMaster, axilReadSlave, addr, data, true);     
+      wait for 5 us;
+      addr := X"00000004";
+      axiLiteBusSimRead(clk200, axilReadMaster, axilReadSlave, addr, data, true);
+      addr := X"0000000C";
+      axiLiteBusSimRead(clk200, axilReadMaster, axilReadSlave, addr, data, true);      
       wait;
    end process sim;
 

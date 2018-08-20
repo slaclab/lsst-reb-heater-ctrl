@@ -101,11 +101,14 @@ begin
       v := r;
 
       -- Establish a sync pulse at 400 kHz
+      -- Send the pulse a few cycles early to keep everything aligned
       v.syncPulse := '0';
       v.syncCount := r.syncCount + 1;
+      if (r.syncCount = 496) then
+         v.syncPulse := '1';         
+      end if;
       if (r.syncCount = 499) then
          v.syncCount := (others => '0');
-         v.syncPulse := '1';
       end if;
 
       -- Check for changed values every syncPulse and update PWMs if necessary

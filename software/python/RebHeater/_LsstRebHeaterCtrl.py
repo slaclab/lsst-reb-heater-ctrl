@@ -125,6 +125,7 @@ class RebPwmCtrl(pr.Device):
         for i in range(12):
             self.add(RebHeaterChannel(
                 name = f'Channel[{i}]',
+                enabled = False,
                 offset = i*8))
                 
 
@@ -153,7 +154,9 @@ class LsstRebHeaterCtrlRoot(lsst.LsstPwrCtrlRoot):
         self.add(LsstRebHeaterCtrl(
             memBase = self.srp))
 
-        self.start(pollEn=pollEn)
+        self.start(timeout=10000000, pollEn=pollEn)
+        self.LsstRebHeaterCtrl.LsstPwrCtrlCore.Xadc.enable.set(False)
+        self.LsstRebHeaterCtrl.LsstPwrCtrlCore.AxiMicronN25Q.enable.set(False)
 
     
     

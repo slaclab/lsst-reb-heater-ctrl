@@ -12,4 +12,4 @@ loadRuckusTcl $::env(TOP_DIR)/common
 # Load target's source code and constraints
 loadSource      -dir  "$::DIR_PATH/hdl/"
 loadConstraints -dir  "$::DIR_PATH/hdl/"
-loadSource      -dir  -sim_only "$::DIR_PATH/sim/"
+loadSource      -sim_only -dir  "$::DIR_PATH/sim/"

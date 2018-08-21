@@ -55,6 +55,7 @@ architecture rtl of RebPwmCtrl is
       syncCount      : slv(11 downto 0);
       syncPulse      : sl;
       outputEn       : slv(11 downto 0);
+      outputEnTmp    : slv(11 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record RegType;
@@ -71,6 +72,7 @@ architecture rtl of RebPwmCtrl is
       syncCount      => (others => '0'),
       syncPulse      => '0',
       outputEn       => (others => '0'),
+      outputEnTmp    => (others => '0'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
@@ -105,7 +107,7 @@ begin
       v.syncPulse := '0';
       v.syncCount := r.syncCount + 1;
       if (r.syncCount = 496) then
-         v.syncPulse := '1';         
+         v.syncPulse := '1';
       end if;
       if (r.syncCount = 499) then
          v.syncCount := (others => '0');
@@ -119,6 +121,7 @@ begin
                v.highCount(i)      := r.highCountTmp(i);
                v.lowCount(i)       := r.lowCountTmp(i);
                v.delayCount(i)     := r.delayCountTmp(i);
+               v.outputEn(i)       := r.outputEnTmp(i);
                v.clkDivRst(i)      := '1';
                v.channelChanged(i) := '0';
             end if;
@@ -142,13 +145,16 @@ begin
          axiSlaveRegister(axilEp, toSlv(i*8, 8), 0, v.highCountTmp(i));
          axiSlaveRegister(axilEp, toSlv(i*8, 8), 9, v.lowCountTmp(i));
          axiSlaveRegister(axilEp, toSlv(i*8, 8), 18, v.delayCountTmp(i));
-         axiSlaveRegister(axilEp, toSlv(i*8, 8), 27, v.outputEn(i));
-         axiSlaveRegister(axilEp, toSlv(i*8, 8), 31, v.channelChanged(i), '1');
+         axiSlaveRegister(axilEp, toSlv(i*8, 8), 27, v.outputEnTmp(i));
+         axiWrDetect(axilEp, toSlv(i*8, 8), v.channelChanged(i));
          -- Readback registers for sanity checking         
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 0, r.highCount(i));
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 9, r.lowCount(i));
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 18, r.delayCount(i));
       end loop;
+
+      -- Use this to set multiple channels to a common phase alignment reference
+      axiSlaveRegister(axilEp, toSlv(12*8, 8), 0, v.channelChanged);
 
       axiSlaveDefault(axilEp, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
       ----------------------------------------------------------------------------------------------

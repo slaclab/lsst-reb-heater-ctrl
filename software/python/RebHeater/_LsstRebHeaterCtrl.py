@@ -116,7 +116,7 @@ class RebHeaterChannel(pr.Device):
             bitSize = 9,
             base = pr.UInt))
         
-
+ 
 
 
 class RebPwmCtrl(pr.Device):
@@ -127,6 +127,12 @@ class RebPwmCtrl(pr.Device):
                 name = f'Channel[{i}]',
                 enabled = False,
                 offset = i*8))
+
+        self.add(pr.RemoteCommand(
+            name = 'AlignChannels',
+            offset = 12*8,
+            bitSize = 12,
+            function = pr.RemoteCommand.touch))
                 
 
 class LsstRebHeaterCtrl(pr.Device):

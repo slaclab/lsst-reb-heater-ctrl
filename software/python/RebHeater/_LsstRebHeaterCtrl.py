@@ -87,7 +87,7 @@ class RebHeaterChannel(pr.Device):
             units = 'deg',
             dependencies = deps,
             linkedGet = lambda: ((self.DelayCount.value()) * 360) / (self.HighCount.value() + self.LowCount.value() + 2),
-            linkedSet = lambda value: self.DelayCount.set(int(value / 360) * (self.HighCount.value() + self.LowCount.value() + 2))))
+            linkedSet = lambda value: self.DelayCount.set(round((value / 360) * (self.HighCount.value() + self.LowCount.value() + 2)))))
 
         self.add(pr.RemoteVariable(
             name = 'HighCountRB',

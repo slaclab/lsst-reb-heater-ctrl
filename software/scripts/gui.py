@@ -6,7 +6,7 @@ import sys
 
 rogue.Logging.setFilter('pyrogue.SrpV3', rogue.Logging.Debug)
 
-with RebHeater.LsstRebHeaterCtrlRoot(sim=True) as root:
+with RebHeater.LsstRebHeaterCtrlRoot(sim=False) as root:
     # Create GUI
     appTop = PyQt4.QtGui.QApplication(sys.argv)
     guiTop = pyrogue.gui.GuiTop(group='GUI')

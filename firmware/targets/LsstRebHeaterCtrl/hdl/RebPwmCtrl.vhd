@@ -51,7 +51,7 @@ architecture rtl of RebPwmCtrl is
       highCountTmp   : slv9Array(11 downto 0);
       lowCountTmp    : slv9Array(11 downto 0);
       delayCountTmp  : slv9Array(11 downto 0);
-      channelChanged : slv(11 downto 0);
+      alignChannel   : slv(11 downto 0);
       syncCount      : slv(11 downto 0);
       syncPulse      : sl;
       outputEn       : slv(11 downto 0);
@@ -68,7 +68,7 @@ architecture rtl of RebPwmCtrl is
       highCountTmp   => (others => toSlv(249, 9)),
       lowCountTmp    => (others => toSlv(249, 9)),
       delayCountTmp  => (others => (others => '0')),
-      channelChanged => (others => '0'),
+      alignChannel   => (others => '0'),
       syncCount      => (others => '0'),
       syncPulse      => '0',
       outputEn       => (others => '0'),
@@ -78,6 +78,9 @@ architecture rtl of RebPwmCtrl is
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
+
+   signal preRise : slv(11 downto 0);
+   signal preFall : slv(11 downto 0);
 
 begin
 
@@ -92,10 +95,12 @@ begin
             highCount  => r.highCount(i),   -- [in]
             lowCount   => r.lowCount(i),    -- [in]
             delayCount => r.delayCount(i),  -- [in]
-            divClk     => pwm(i));          -- [out]
+            divClk     => pwm(i),           -- [out]
+            preRise    => preRise(i),       -- [out]
+            preFall    => preFall(i));      -- [out]
    end generate PWM_GEN;
 
-   comb : process (axilReadMaster, axilWriteMaster, r, rst200) is
+   comb : process (axilReadMaster, axilWriteMaster, preFall, r, rst200) is
       variable v      : RegType;
       variable axilEp : AxiLiteEndpointType;
    begin
@@ -104,29 +109,55 @@ begin
 
       -- Establish a sync pulse at 400 kHz
       -- Send the pulse a few cycles early to keep everything aligned
-      v.syncPulse := '0';
-      v.syncCount := r.syncCount + 1;
-      if (r.syncCount = 496) then
-         v.syncPulse := '1';
-      end if;
-      if (r.syncCount = 499) then
-         v.syncCount := (others => '0');
-      end if;
+--       v.syncPulse := '0';
+--       v.syncCount := r.syncCount + 1;
+--       if (r.syncCount = 496) then
+--          v.syncPulse := '1';
+--       end if;
+--       if (r.syncCount = 499) then
+--          v.syncCount := (others => '0');
+--       end if;
 
       -- Check for changed values every syncPulse and update PWMs if necessary
-      v.clkDivRst := (others => '0');
-      if (r.syncPulse = '1') then
-         for i in 0 to 11 loop
-            if (r.channelChanged(i) = '1') then
-               v.highCount(i)      := r.highCountTmp(i);
-               v.lowCount(i)       := r.lowCountTmp(i);
-               v.delayCount(i)     := r.delayCountTmp(i);
-               v.outputEn(i)       := r.outputEnTmp(i);
-               v.clkDivRst(i)      := '1';
-               v.channelChanged(i) := '0';
-            end if;
-         end loop;
+--       v.clkDivRst := (others => '0');
+--       if (r.syncPulse = '1') then
+--          for i in 0 to 11 loop
+--             if (r.alignChannel(i) = '1') then
+--                v.clkDivRst(i)      := '1';
+--                v.clkDivRst(i)      := '1';
+--                v.alignChannel(i) := '0';
+--             end if;
+--          end loop;
+--       end if;
+
+      -- Assert reset as pwm falls
+      for i in 0 to 11 loop
+         if (r.alignChannel(i) = '1' and preFall(i) = '1') then
+            v.clkDivRst(i) := '1';
+         end if;
+      end loop;
+
+      -- Release all resets one all channels being aligned have been reset
+      if (uOr(r.alignChannel) = '1' and uOr(r.alignChannel xor r.clkDivRst) = '0') then
+         v.syncCount := r.syncCount + 1;
       end if;
+
+      if (r.syncCount = 499) then
+         v.clkDivRst    := (others => '0');
+         v.alignChannel := (others => '0');
+         v.syncCount := (others => '0');
+      end if;         
+      
+
+      for i in 0 to 11 loop
+         if (preFall(i) = '1') then
+            v.highCount(i)  := r.highCountTmp(i);
+            v.lowCount(i)   := r.lowCountTmp(i);
+            v.delayCount(i) := r.delayCountTmp(i);
+            v.outputEn(i)   := r.outputEnTmp(i);
+
+         end if;
+      end loop;
 
       -- Keep pwms off by holding in resent when outputEn = 0
 --       for i in 0 to 11 loop
@@ -146,7 +177,7 @@ begin
          axiSlaveRegister(axilEp, toSlv(i*8, 8), 9, v.lowCountTmp(i));
          axiSlaveRegister(axilEp, toSlv(i*8, 8), 18, v.delayCountTmp(i));
          axiSlaveRegister(axilEp, toSlv(i*8, 8), 27, v.outputEnTmp(i));
-         axiWrDetect(axilEp, toSlv(i*8, 8), v.channelChanged(i));
+--         axiWrDetect(axilEp, toSlv(i*8, 8), v.alignChannel(i));
          -- Readback registers for sanity checking         
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 0, r.highCount(i));
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 9, r.lowCount(i));
@@ -154,7 +185,7 @@ begin
       end loop;
 
       -- Use this to set multiple channels to a common phase alignment reference
-      axiSlaveRegister(axilEp, toSlv(12*8, 8), 0, v.channelChanged);
+      axiSlaveRegister(axilEp, toSlv(12*8, 8), 0, v.alignChannel);
 
       axiSlaveDefault(axilEp, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
       ----------------------------------------------------------------------------------------------

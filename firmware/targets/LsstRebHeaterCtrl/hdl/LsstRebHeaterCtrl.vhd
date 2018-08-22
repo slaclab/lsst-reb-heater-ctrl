@@ -2,7 +2,7 @@
 -- File       : LsstRebHeaterCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-04-05
--- Last update: 2018-08-20
+-- Last update: 2018-08-22
 -------------------------------------------------------------------------------
 -- Description: Firmware Target's Top Level
 -------------------------------------------------------------------------------
@@ -225,7 +225,7 @@ begin
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => 12,
-         MASTERS_CONFIG_G   => genAxiLiteConfig(12, x"0002_0000", 18, 12))
+         MASTERS_CONFIG_G   => genAxiLiteConfig(12, x"0004_0000", 18, 12))
       port map (
          axiClk              => axilClk,
          axiClkRst           => axilRst,
@@ -237,6 +237,17 @@ begin
          mAxiWriteSlaves     => ltc2945AxilWriteSlaves,
          mAxiReadMasters     => ltc2945AxilReadMasters,
          mAxiReadSlaves      => ltc2945AxilReadSlaves);
+
+   U_StartConv : entity work.Heartbeat
+      generic map(
+         TPD_G        => 1 ns,
+         PERIOD_IN_G  => 8.0E-9,        --units of seconds
+         PERIOD_OUT_G => 1.0E-0)        --units of seconds
+      port map (
+         clk => axilClk,
+         rst => axilRst,
+         o   => startConv);
+
 
    LTC2495_GEN : for i in 11 downto 0 generate
       U_LTC2945Axil_1 : entity work.LTC2945Axil
@@ -279,7 +290,7 @@ begin
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => 6,
-         MASTERS_CONFIG_G   => genAxiLiteConfig(6, x"0004_0000", 18, 12))
+         MASTERS_CONFIG_G   => genAxiLiteConfig(6, x"0008_0000", 18, 12))
       port map (
          axiClk              => axilClk,
          axiClkRst           => axilRst,
@@ -305,7 +316,7 @@ begin
             axilWriteSlave  => lambdaAxilWriteSlaves(i),   -- [out]
             i2ci            => lambdaI2cIn(i),             -- [inout]
             i2co            => lambdaI2cOut(i),            -- [inout]
-            StartConv       => startConv,                  -- [in]
+            StartConv       => '0',                  -- [in]
             LambdaComFault  => lambdaComFault(i));         -- [out]
 
       BOARD_SDA_IOBUFT : IOBUF

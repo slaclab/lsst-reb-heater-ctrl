@@ -2,7 +2,7 @@
 -- File       : LsstRebHeaterCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-04-05
--- Last update: 2018-08-22
+-- Last update: 2018-08-23
 -------------------------------------------------------------------------------
 -- Description: Firmware Target's Top Level
 -------------------------------------------------------------------------------
@@ -146,6 +146,8 @@ begin
          vNIn             => vNIn,
          -- Eth config
          overrideEthCofig => '1',
+         overrideMacAddr => X"01_00_16_56_00_08",
+         overrideIpAddr => X"0B_01_A8_C0",
          -- Boot Memory Ports
          bootCsL          => bootCsL,
          bootMosi         => bootMosi,
@@ -250,6 +252,25 @@ begin
 
 
    LTC2495_GEN : for i in 11 downto 0 generate
+--       U_AxiI2cMasterCore_1 : entity work.AxiI2cMasterCore
+--          generic map (
+--             TPD_G           => TPD_G,
+--             DEVICE_MAP_G    => (
+--                0            => MakeI2cAxiLiteDevType("0001101111", 32, 8, '1', '1')),
+--             AXI_CLK_FREQ_G  => 125.0E6,
+--             I2C_SCL_FREQ_G  => 100.0E+3,
+--             I2C_MIN_PULSE_G => 100.0E-9)
+--          port map (
+--             axiClk         => axilClk,                    -- [in]
+--             axiRst         => axilRst,                    -- [in]
+--             axiReadMaster  => ltc2945AxiReadMasters(i),   -- [in]
+--             axiReadSlave   => ltc2945AxiReadSlaves(i),    -- [out]
+--             axiWriteMaster => ltc2945AxiWriteMasters(i),  -- [in]
+--             axiWriteSlave  => ltc2945AxiWriteSlaves(i),   -- [out]
+--             scl            => ltc2945Scl(i),
+--             sda            => ltc2945Sda(i));
+      
+
       U_LTC2945Axil_1 : entity work.LTC2945Axil
          generic map (
             TPD_G => TPD_G)
@@ -316,7 +337,7 @@ begin
             axilWriteSlave  => lambdaAxilWriteSlaves(i),   -- [out]
             i2ci            => lambdaI2cIn(i),             -- [inout]
             i2co            => lambdaI2cOut(i),            -- [inout]
-            StartConv       => '0',                  -- [in]
+            StartConv       => '0',                        -- [in]
             LambdaComFault  => lambdaComFault(i));         -- [out]
 
       BOARD_SDA_IOBUFT : IOBUF

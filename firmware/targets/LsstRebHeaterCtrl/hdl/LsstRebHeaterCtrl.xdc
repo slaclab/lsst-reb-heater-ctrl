@@ -152,6 +152,14 @@ set_property -dict { PACKAGE_PIN U16  IOSTANDARD LVCMOS33}  [get_ports { lambdaE
 set_property -dict { PACKAGE_PIN V13  IOSTANDARD LVCMOS33}  [get_ports { cryoEnL }]
 set_property -dict { PACKAGE_PIN V14  IOSTANDARD LVCMOS33}  [get_ports { coldplateEnL }]
 
+set_property -dict { PACKAGE_PIN AA18  IOSTANDARD LVCMOS33}  [get_ports { tempSda }]
+set_property -dict { PACKAGE_PIN AB18  IOSTANDARD LVCMOS33}  [get_ports { tempScl }]
+set_property -dict { PACKAGE_PIN U17  IOSTANDARD LVCMOS33}  [get_ports { tempAlertL }]
+set_property -dict { PACKAGE_PIN U18  IOSTANDARD LVCMOS33}  [get_ports { tempCritL }]
+
+
+
+
 
 
 

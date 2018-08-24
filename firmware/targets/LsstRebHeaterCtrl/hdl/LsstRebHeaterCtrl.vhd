@@ -63,7 +63,12 @@ entity LsstRebHeaterCtrl is
       ltc2945Scl      : inout slv(11 downto 0);
       -- Interlocks
       cryoEnL         : in    sl;
-      coldplateEnL    : in    sl);
+      coldplateEnL    : in    sl;
+      -- Temp
+      tempSda         : inout sl;
+      tempScl         : inout sl;
+      tempAlertL      : in    sl;
+      tempCritL       : in    sl);
 end LsstRebHeaterCtrl;
 
 architecture top_level of LsstRebHeaterCtrl is
@@ -116,6 +121,12 @@ architecture top_level of LsstRebHeaterCtrl is
 
    signal lambdaI2cIn  : i2c_in_array(11 downto 0);
    signal lambdaI2cOut : i2c_out_array(11 downto 0);
+
+   -------------------------------------------------------------------------------------------------
+   -- Temp signals
+   -------------------------------------------------------------------------------------------------
+   signal tempI2cIn  : i2c_in_type;
+   signal tempI2cOut : i2c_out_type;
 
 
 
@@ -338,14 +349,14 @@ begin
             StartConv       => startConv,                  -- [in]
             LambdaComFault  => lambdaComFault(i));         -- [out]
 
-      BOARD_SDA_IOBUFT : IOBUF
+      LAMBDA_SDA_IOBUFT : IOBUF
          port map (
             I  => lambdaI2cOut(i).sda,
             O  => lambdaI2cIn(i).sda,
             IO => lambdaSda(i),
             T  => lambdaI2cOut(i).sdaoen);
 
-      BOARD_SCL_IOBUFT : IOBUF
+      LAMBDA_SCL_IOBUFT : IOBUF
          port map (
             I  => lambdaI2cOut(i).scl,
             O  => lambdaI2cIn(i).scl,
@@ -388,5 +399,38 @@ begin
          readRegister(0)(0)           => cryoEnL,              -- [in]
          readRegister(0)(1)           => coldplateEnL,         -- [in]
          readRegister(0)(31 downto 2) => (others => '0'));     -- [in]
+
+   -------------------------------------------------------------------------------------------------
+   -- Temperature on ch 4
+   -------------------------------------------------------------------------------------------------
+   U_SA56004Axil_1 : entity work.SA56004Axil
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         axilClk         => axilClk,              -- [in]
+         axilRst         => axilRst,              -- [in]
+         axilReadMaster  => axilReadMasters(4),   -- [in]
+         axilReadSlave   => axilReadSlaves(4),    -- [out]
+         axilWriteMaster => axilWriteMasters(4),  -- [in]
+         axilWriteSlave  => axilWriteSlaves(4),   -- [out]
+         i2ci            => tempI2cIn,            -- [inout]
+         i2co            => tempIi2cOut,          -- [inout]
+         StartConv       => startConv,            -- [in]
+         SA56004ComFault => open);                -- [out]
+
+   TEMP_SDA_IOBUFT : IOBUF
+      port map (
+         I  => tempI2cOut(i).sda,
+         O  => tempI2cIn(i).sda,
+         IO => tempSda(i),
+         T  => tempI2cOut(i).sdaoen);
+
+   TEMP_SCL_IOBUFT : IOBUF
+      port map (
+         I  => tempI2cOut(i).scl,
+         O  => tempI2cIn(i).scl,
+         IO => tempScl(i),
+         T  => tempI2cOut(i).scloen);
+
 
 end top_level;

@@ -52,7 +52,7 @@ entity LsstRebHeaterCtrl is
       lambdaAcOk      : in    slv(5 downto 0);
       lambdaPwrOk     : in    slv(5 downto 0);
       lambdaOtw       : in    slv(5 downto 0);
-      lambdaRemoteOnL : out   slv(5 downto 0);
+      lambdaRemoteOnL : out   slv(5 downto 0) := (others => '1');
       lambdaSda       : inout slv(5 downto 0);
       lambdaScl       : inout slv(5 downto 0);
       -- REB Heater channels
@@ -107,10 +107,10 @@ architecture top_level of LsstRebHeaterCtrl is
    -------------------------------------------------------------------------------------------------
    -- Lambda Signals
    -------------------------------------------------------------------------------------------------
-   signal lambdaAxilWriteMasters : AxiLiteWriteMasterArray(5 downto 0);
-   signal lambdaAxilWriteSlaves  : AxiLiteWriteSlaveArray(5 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C);
-   signal lambdaAxilReadMasters  : AxiLiteReadMasterArray(5 downto 0);
-   signal lambdaAxilReadSlaves   : AxiLiteReadSlaveArray(5 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_DECERR_C);
+   signal lambdaAxilWriteMasters : AxiLiteWriteMasterArray(6 downto 0);
+   signal lambdaAxilWriteSlaves  : AxiLiteWriteSlaveArray(6 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C);
+   signal lambdaAxilReadMasters  : AxiLiteReadMasterArray(6 downto 0);
+   signal lambdaAxilReadSlaves   : AxiLiteReadSlaveArray(6 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_DECERR_C);
 
    signal lambdaComFault : slv(5 downto 0);
 
@@ -146,8 +146,8 @@ begin
          vNIn             => vNIn,
          -- Eth config
          overrideEthCofig => '1',
-         overrideMacAddr => X"01_00_16_56_00_08",
-         overrideIpAddr => X"0B_01_A8_C0",
+         overrideMacAddr  => X"01_00_16_56_00_08",
+         overrideIpAddr   => X"0B_01_A8_C0",
          -- Boot Memory Ports
          bootCsL          => bootCsL,
          bootMosi         => bootMosi,
@@ -243,8 +243,8 @@ begin
    U_StartConv : entity work.Heartbeat
       generic map(
          TPD_G        => 1 ns,
-         PERIOD_IN_G  => 8.0E-9,        --units of seconds
-         PERIOD_OUT_G => 1.0E-0)        --units of seconds
+         PERIOD_IN_G  => 8.0E-9,                             --units of seconds
+         PERIOD_OUT_G => ite(SIMULATION_G, 1.0E-3, 1.0E-0))  --units of seconds
       port map (
          clk => axilClk,
          rst => axilRst,
@@ -252,51 +252,51 @@ begin
 
 
    LTC2495_GEN : for i in 11 downto 0 generate
-      U_Ltc2945I2cMap : entity work.Ltc2945I2cMap
-         generic map (
-            TPD_G           => TPD_G,
-            AXI_CLK_FREQ_G  => 125.0E6,
-            I2C_SCL_FREQ_G  => 100.0E+3,
-            I2C_MIN_PULSE_G => 100.0E-9)
-         port map (
-            axiClk         => axilClk,                    -- [in]
-            axiRst         => axilRst,                    -- [in]
-            axiReadMaster  => ltc2945AxiReadMasters(i),   -- [in]
-            axiReadSlave   => ltc2945AxiReadSlaves(i),    -- [out]
-            axiWriteMaster => ltc2945AxiWriteMasters(i),  -- [in]
-            axiWriteSlave  => ltc2945AxiWriteSlaves(i),   -- [out]
-            scl            => ltc2945Scl(i),
-            sda            => ltc2945Sda(i));
-      
-
---       U_LTC2945Axil_1 : entity work.LTC2945Axil
+--       U_Ltc2945I2cMap : entity work.Ltc2945I2cMap
 --          generic map (
---             TPD_G => TPD_G)
+--             TPD_G           => TPD_G,
+--             AXI_CLK_FREQ_G  => 125.0E6,
+--             I2C_SCL_FREQ_G  => 100.0E+3,
+--             I2C_MIN_PULSE_G => 100.0E-9)
 --          port map (
---             axilClk         => axilClk,                     -- [in]
---             axilRst         => axilRst,                     -- [in]
---             axilReadMaster  => ltc2945AxilReadMasters(i),   -- [in]
---             axilReadSlave   => ltc2945AxilReadSlaves(i),    -- [out]
---             axilWriteMaster => ltc2945AxilWriteMasters(i),  -- [in]
---             axilWriteSlave  => ltc2945AxilWriteSlaves(i),   -- [out]
---             i2ci            => ltc2945I2cIn(i),             -- [inout]
---             i2co            => ltc2945I2cOut(i),            -- [inout]
---             StartConv       => startConv,                   -- [in]
---             LTC2945ComFault => ltc2945ComFault(i));         -- [out]
+--             axiClk         => axilClk,                    -- [in]
+--             axiRst         => axilRst,                    -- [in]
+--             axiReadMaster  => ltc2945AxilReadMasters(i),   -- [in]
+--             axiReadSlave   => ltc2945AxilReadSlaves(i),    -- [out]
+--             axiWriteMaster => ltc2945AxilWriteMasters(i),  -- [in]
+--             axiWriteSlave  => ltc2945AxilWriteSlaves(i),   -- [out]
+--             scl            => ltc2945Scl(i),
+--             sda            => ltc2945Sda(i));
 
---       BOARD_SDA_IOBUFT : IOBUF
---          port map (
---             I  => ltc2945I2cOut(i).sda,
---             O  => ltc2945I2cIn(i).sda,
---             IO => ltc2945Sda(i),
---             T  => ltc2945I2cOut(i).sdaoen);
 
---       BOARD_SCL_IOBUFT : IOBUF
---          port map (
---             I  => ltc2945I2cOut(i).scl,
---             O  => ltc2945I2cIn(i).scl,
---             IO => ltc2945Scl(i),
---             T  => ltc2945I2cOut(i).scloen);
+      U_LTC2945Axil_1 : entity work.LTC2945Axil
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            axilClk         => axilClk,                     -- [in]
+            axilRst         => axilRst,                     -- [in]
+            axilReadMaster  => ltc2945AxilReadMasters(i),   -- [in]
+            axilReadSlave   => ltc2945AxilReadSlaves(i),    -- [out]
+            axilWriteMaster => ltc2945AxilWriteMasters(i),  -- [in]
+            axilWriteSlave  => ltc2945AxilWriteSlaves(i),   -- [out]
+            i2ci            => ltc2945I2cIn(i),             -- [inout]
+            i2co            => ltc2945I2cOut(i),            -- [inout]
+            StartConv       => startConv,                   -- [in]
+            LTC2945ComFault => ltc2945ComFault(i));         -- [out]
+
+      BOARD_SDA_IOBUFT : IOBUF
+         port map (
+            I  => ltc2945I2cOut(i).sda,
+            O  => ltc2945I2cIn(i).sda,
+            IO => ltc2945Sda(i),
+            T  => ltc2945I2cOut(i).sdaoen);
+
+      BOARD_SCL_IOBUFT : IOBUF
+         port map (
+            I  => ltc2945I2cOut(i).scl,
+            O  => ltc2945I2cIn(i).scl,
+            IO => ltc2945Scl(i),
+            T  => ltc2945I2cOut(i).scloen);
 
    end generate LTC2495_GEN;
 
@@ -308,8 +308,8 @@ begin
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => 6,
-         MASTERS_CONFIG_G   => genAxiLiteConfig(6, x"0008_0000", 18, 12))
+         NUM_MASTER_SLOTS_G => 7,
+         MASTERS_CONFIG_G   => genAxiLiteConfig(7, x"0008_0000", 18, 12))
       port map (
          axiClk              => axilClk,
          axiClkRst           => axilRst,
@@ -335,7 +335,7 @@ begin
             axilWriteSlave  => lambdaAxilWriteSlaves(i),   -- [out]
             i2ci            => lambdaI2cIn(i),             -- [inout]
             i2co            => lambdaI2cOut(i),            -- [inout]
-            StartConv       => '0',                        -- [in]
+            StartConv       => startConv,                  -- [in]
             LambdaComFault  => lambdaComFault(i));         -- [out]
 
       BOARD_SDA_IOBUFT : IOBUF
@@ -352,6 +352,23 @@ begin
             IO => lambdaScl(i),
             T  => lambdaI2cOut(i).scloen);
    end generate LAMBDA_GEN;
+
+
+   U_LambdaIO_1 : entity work.LambdaIO
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         axilClk         => axilClk,                    -- [in]
+         axilRst         => axilRst,                    -- [in]
+         axilReadMaster  => lambdaAxilReadMasters(6),   -- [in]
+         axilReadSlave   => lambdaAxilReadSlaves(6),    -- [out]
+         axilWriteMaster => lambdaAxilWriteMasters(6),  -- [in]
+         axilWriteSlave  => lambdaAxilWriteSlaves(6),   -- [out]
+         lambdaEnabled   => lambdaEnabled,              -- [in]
+         lambdaAcOk      => lambdaAcOk,                 -- [in]
+         lambdaPwrOk     => lambdaPwrOk,                -- [in]
+         lambdaOtw       => lambdaOtw,                  -- [in]
+         lambdaRemoteOnL => lambdaRemoteOnL);           -- [out]
 
    -------------------------------------------------------------------------------------------------
    -- Interlocks on ch 3

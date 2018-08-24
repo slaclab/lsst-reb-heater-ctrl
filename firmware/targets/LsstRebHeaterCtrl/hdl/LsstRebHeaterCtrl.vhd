@@ -2,7 +2,7 @@
 -- File       : LsstRebHeaterCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-04-05
--- Last update: 2018-08-23
+-- Last update: 2018-08-24
 -------------------------------------------------------------------------------
 -- Description: Firmware Target's Top Level
 -------------------------------------------------------------------------------
@@ -252,53 +252,51 @@ begin
 
 
    LTC2495_GEN : for i in 11 downto 0 generate
---       U_AxiI2cMasterCore_1 : entity work.AxiI2cMasterCore
---          generic map (
---             TPD_G           => TPD_G,
---             DEVICE_MAP_G    => (
---                0            => MakeI2cAxiLiteDevType("0001101111", 32, 8, '1', '1')),
---             AXI_CLK_FREQ_G  => 125.0E6,
---             I2C_SCL_FREQ_G  => 100.0E+3,
---             I2C_MIN_PULSE_G => 100.0E-9)
---          port map (
---             axiClk         => axilClk,                    -- [in]
---             axiRst         => axilRst,                    -- [in]
---             axiReadMaster  => ltc2945AxiReadMasters(i),   -- [in]
---             axiReadSlave   => ltc2945AxiReadSlaves(i),    -- [out]
---             axiWriteMaster => ltc2945AxiWriteMasters(i),  -- [in]
---             axiWriteSlave  => ltc2945AxiWriteSlaves(i),   -- [out]
---             scl            => ltc2945Scl(i),
---             sda            => ltc2945Sda(i));
+      U_Ltc2945I2cMap : entity work.Ltc2945I2cMap
+         generic map (
+            TPD_G           => TPD_G,
+            AXI_CLK_FREQ_G  => 125.0E6,
+            I2C_SCL_FREQ_G  => 100.0E+3,
+            I2C_MIN_PULSE_G => 100.0E-9)
+         port map (
+            axiClk         => axilClk,                    -- [in]
+            axiRst         => axilRst,                    -- [in]
+            axiReadMaster  => ltc2945AxiReadMasters(i),   -- [in]
+            axiReadSlave   => ltc2945AxiReadSlaves(i),    -- [out]
+            axiWriteMaster => ltc2945AxiWriteMasters(i),  -- [in]
+            axiWriteSlave  => ltc2945AxiWriteSlaves(i),   -- [out]
+            scl            => ltc2945Scl(i),
+            sda            => ltc2945Sda(i));
       
 
-      U_LTC2945Axil_1 : entity work.LTC2945Axil
-         generic map (
-            TPD_G => TPD_G)
-         port map (
-            axilClk         => axilClk,                     -- [in]
-            axilRst         => axilRst,                     -- [in]
-            axilReadMaster  => ltc2945AxilReadMasters(i),   -- [in]
-            axilReadSlave   => ltc2945AxilReadSlaves(i),    -- [out]
-            axilWriteMaster => ltc2945AxilWriteMasters(i),  -- [in]
-            axilWriteSlave  => ltc2945AxilWriteSlaves(i),   -- [out]
-            i2ci            => ltc2945I2cIn(i),             -- [inout]
-            i2co            => ltc2945I2cOut(i),            -- [inout]
-            StartConv       => startConv,                   -- [in]
-            LTC2945ComFault => ltc2945ComFault(i));         -- [out]
+--       U_LTC2945Axil_1 : entity work.LTC2945Axil
+--          generic map (
+--             TPD_G => TPD_G)
+--          port map (
+--             axilClk         => axilClk,                     -- [in]
+--             axilRst         => axilRst,                     -- [in]
+--             axilReadMaster  => ltc2945AxilReadMasters(i),   -- [in]
+--             axilReadSlave   => ltc2945AxilReadSlaves(i),    -- [out]
+--             axilWriteMaster => ltc2945AxilWriteMasters(i),  -- [in]
+--             axilWriteSlave  => ltc2945AxilWriteSlaves(i),   -- [out]
+--             i2ci            => ltc2945I2cIn(i),             -- [inout]
+--             i2co            => ltc2945I2cOut(i),            -- [inout]
+--             StartConv       => startConv,                   -- [in]
+--             LTC2945ComFault => ltc2945ComFault(i));         -- [out]
 
-      BOARD_SDA_IOBUFT : IOBUF
-         port map (
-            I  => ltc2945I2cOut(i).sda,
-            O  => ltc2945I2cIn(i).sda,
-            IO => ltc2945Sda(i),
-            T  => ltc2945I2cOut(i).sdaoen);
+--       BOARD_SDA_IOBUFT : IOBUF
+--          port map (
+--             I  => ltc2945I2cOut(i).sda,
+--             O  => ltc2945I2cIn(i).sda,
+--             IO => ltc2945Sda(i),
+--             T  => ltc2945I2cOut(i).sdaoen);
 
-      BOARD_SCL_IOBUFT : IOBUF
-         port map (
-            I  => ltc2945I2cOut(i).scl,
-            O  => ltc2945I2cIn(i).scl,
-            IO => ltc2945Scl(i),
-            T  => ltc2945I2cOut(i).scloen);
+--       BOARD_SCL_IOBUFT : IOBUF
+--          port map (
+--             I  => ltc2945I2cOut(i).scl,
+--             O  => ltc2945I2cIn(i).scl,
+--             IO => ltc2945Scl(i),
+--             T  => ltc2945I2cOut(i).scloen);
 
    end generate LTC2495_GEN;
 

@@ -7,7 +7,7 @@ import LsstPwrCtrlCore.i2c as i2c
 BASE_FREQUENCY = 200e6
 BASE_PERIOD = 1/BASE_FREQUENCY
 
-class RebHeaterChannel(pr.Device):
+class RebHeaterPwmChannel(pr.Device):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -66,6 +66,7 @@ class RebHeaterChannel(pr.Device):
             name = 'Frequency',
             mode = 'RW',
             units = 'kHz',
+            disp = '{:.4f}',            
             #value = 500,
             dependencies = deps,
             linkedGet = lambda: 1.0e-3 / (BASE_PERIOD * (2+self.HighCount.value()+self.LowCount.value())),
@@ -75,7 +76,7 @@ class RebHeaterChannel(pr.Device):
             name = 'DutyCycle',
             mode = 'RW',
             units = 'frac-high',
-            disp = '{:1.2f}',
+            disp = '{:1.4f}',
             #value = .5,
             dependencies = deps,
             linkedGet = lambda: ((self.HighCount.value()+1) / (self.HighCount.value() + self.LowCount.value() + 2)),
@@ -93,6 +94,7 @@ class RebHeaterChannel(pr.Device):
             name = 'HighCountRB',
             mode = 'RO',
             disp = '{:d}',
+            hidden = True,
             offset = 0x4,
             bitOffset = 0,
             bitSize = 9,
@@ -102,6 +104,7 @@ class RebHeaterChannel(pr.Device):
             name = 'LowCountRB',
             mode = 'RO',
             disp = '{:d}',
+            hidden = True,
             offset = 0x4,
             bitOffset = 9,
             bitSize = 9,
@@ -111,21 +114,20 @@ class RebHeaterChannel(pr.Device):
             name = 'DelayCountRb',
             mode = 'RO',
             disp = '{:d}',
+            hidden = True,
             offset = 0x4,
             bitOffset = 18,
             bitSize = 9,
             base = pr.UInt))
-        
- 
-
+                
 
 class RebPwmCtrl(pr.Device):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         for i in range(12):
-            self.add(RebHeaterChannel(
+            self.add(RebHeaterPwmChannel(
                 name = f'Channel[{i}]',
-                enabled = False,
+                enabled = True,
                 offset = i*8))
 
         self.add(pr.RemoteCommand(
@@ -133,8 +135,92 @@ class RebPwmCtrl(pr.Device):
             offset = 12*8,
             bitSize = 12,
             function = pr.RemoteCommand.touch))
-                
 
+        
+class RebHeaterCtrlChannel(pr.Device):
+    def __init__(self, pwm, ltc2945, **kwargs):
+        super().__init__(**kwargs)
+
+        self.add(pr.LinkVariable(
+            name = 'OutputEnable',
+            variable = pwm.OutputEnable))            
+
+        self.add(pr.LinkVariable(
+            name = 'Frequency',
+            variable = pwm.Frequency))
+
+        self.add(pr.LinkVariable(
+            name = 'DutyCycle',
+            variable = pwm.DutyCycle))
+
+        self.add(pr.LinkVariable(
+            name = 'PhaseOffset',
+            variable = pwm.PhaseOffset))
+
+        self.add(pr.LinkVariable(
+            name = 'Power',
+            variable = ltc2945.Power))
+
+        self.add(pr.LinkVariable(
+            name = 'Current',
+            variable = ltc2945.Current))
+
+        self.add(pr.LinkVariable(
+            name = 'Voltage',
+            variable = ltc2945.Vin))
+        
+        
+
+class LambdaChannel(pr.Device):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.add(pr.RemoteVariable(
+            name = 'RemoteOn',
+            mode = 'RW',
+            offset = 0,
+            bitOffset = 0,
+            bitSize = 1,
+            enum = {1: 'False', 0: 'True'})) # Active Low
+            
+        self.add(pr.RemoteVariable(
+            name = 'Enabled',
+            mode = 'RO',
+            offset = 0,
+            bitOffset = 1,
+            bitSize = 1,
+            base = pr.Bool))
+
+        self.add(pr.RemoteVariable(
+            name = 'AcOk',
+            mode = 'RO',
+            offset = 0,
+            bitOffset = 2,
+            bitSize = 1,
+            base = pr.Bool))
+
+        self.add(pr.RemoteVariable(
+            name = 'PwrOk',
+            mode = 'RO',
+            offset = 0,
+            bitOffset = 3,
+            bitSize = 1,
+            base = pr.Bool))
+
+        self.add(pr.RemoteVariable(
+            name = 'Otw',
+            mode = 'RO',
+            offset = 0,
+            bitOffset = 4,
+            bitSize = 1,
+            base = pr.Bool))
+        
+class LambdaIO(pr.Device):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        for i in range(6):
+            self.add(LambdaChannel(offset = i*4))
+
+        
 class LsstRebHeaterCtrl(pr.Device):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -142,15 +228,23 @@ class LsstRebHeaterCtrl(pr.Device):
         self.add(lsst.LsstPwrCtrlCore())
 
         self.add(RebPwmCtrl(
+            hidden = True,
             offset = lsst.AXIL_OFFSETS[0]))
 
         for i in range(12):
             self.add(i2c.Ltc2945(
                 name = f'Ltc2945[{i}]',
-                enabled = False,
+                enabled = True,
+                hidden = True,
                 offset = lsst.AXIL_OFFSETS[1] + (i * 0x1000),
                 shunt = 0.02
             ))
+            
+        for i in range(12):
+            self.add(RebHeaterCtrlChannel(
+                name = f'RebHeaterChannel[{i}]',
+                pwm = self.RebPwmCtrl.Channel[i],
+                ltc2945 = self.Ltc2945[i]))
 
         
 class LsstRebHeaterCtrlRoot(lsst.LsstPwrCtrlRoot):

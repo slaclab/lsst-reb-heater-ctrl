@@ -145,7 +145,7 @@ begin
          vPIn             => vPIn,
          vNIn             => vNIn,
          -- Eth config
-         overrideEthCofig => '1',
+         overrideEthCofig => '0',
          overrideMacAddr  => X"01_00_16_56_00_08",
          overrideIpAddr   => X"0B_01_A8_C0",
          -- Boot Memory Ports

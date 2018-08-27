@@ -417,14 +417,14 @@ begin
          I2C_MIN_PULSE_G               => 100.0E-9,
          AXI_CLK_FREQ_G                => 125.0E+6)
       port map (
-         axiClk         => axiClk,               -- [in]
-         axiRst         => axiRst,               -- [in]
+         axiClk         => axilClk,              -- [in]
+         axiRst         => axilRst,              -- [in]
          axiReadMaster  => axilReadMasters(4),   -- [in]
          axiReadSlave   => axilReadSlaves(4),    -- [out]
          axiWriteMaster => axilWriteMasters(4),  -- [in]
          axiWriteSlave  => axilWriteSlaves(4),   -- [out]
-         scl            => scl,                  -- [inout]
-         sda            => sda);                 -- [inout]
+         scl            => tempScl,              -- [inout]
+         sda            => tempSda);             -- [inout]
 
 
 end top_level;

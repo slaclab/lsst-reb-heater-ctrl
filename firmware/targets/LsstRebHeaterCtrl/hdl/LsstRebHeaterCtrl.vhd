@@ -403,34 +403,28 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Temperature on ch 4
    -------------------------------------------------------------------------------------------------
-   U_SA56004Axil_1 : entity work.SA56004Axil
+   U_AxiI2cRegMaster_1 : entity work.AxiI2cRegMaster
       generic map (
-         TPD_G => TPD_G)
+         TPD_G                         => TPD_G,
+         DEVICE_MAP_G                  => (0 =>
+                          (i2cAddress  => "0001010000",
+                           i2cTenbit   => '0',
+                           dataSize    => 8,
+                           addrSize    => 8,
+                           endianness  => '0',
+                           repeatStart => '0')),
+         I2C_SCL_FREQ_G                => 100.0E+3,
+         I2C_MIN_PULSE_G               => 100.0E-9,
+         AXI_CLK_FREQ_G                => 125.0E+6)
       port map (
-         axilClk         => axilClk,              -- [in]
-         axilRst         => axilRst,              -- [in]
-         axilReadMaster  => axilReadMasters(4),   -- [in]
-         axilReadSlave   => axilReadSlaves(4),    -- [out]
-         axilWriteMaster => axilWriteMasters(4),  -- [in]
-         axilWriteSlave  => axilWriteSlaves(4),   -- [out]
-         i2ci            => tempI2cIn,            -- [inout]
-         i2co            => tempI2cOut,           -- [inout]
-         StartConv       => startConv,            -- [in]
-         SA56004ComFault => open);                -- [out]
-
-   TEMP_SDA_IOBUFT : IOBUF
-      port map (
-         I  => tempI2cOut.sda,
-         O  => tempI2cIn.sda,
-         IO => tempSda,
-         T  => tempI2cOut.sdaoen);
-
-   TEMP_SCL_IOBUFT : IOBUF
-      port map (
-         I  => tempI2cOut.scl,
-         O  => tempI2cIn.scl,
-         IO => tempScl,
-         T  => tempI2cOut.scloen);
+         axiClk         => axiClk,               -- [in]
+         axiRst         => axiRst,               -- [in]
+         axiReadMaster  => axilReadMasters(4),   -- [in]
+         axiReadSlave   => axilReadSlaves(4),    -- [out]
+         axiWriteMaster => axilWriteMasters(4),  -- [in]
+         axiWriteSlave  => axilWriteSlaves(4),   -- [out]
+         scl            => scl,                  -- [inout]
+         sda            => sda);                 -- [inout]
 
 
 end top_level;

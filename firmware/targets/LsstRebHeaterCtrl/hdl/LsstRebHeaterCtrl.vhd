@@ -2,7 +2,7 @@
 -- File       : LsstRebHeaterCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-04-05
--- Last update: 2018-08-24
+-- Last update: 2018-08-27
 -------------------------------------------------------------------------------
 -- Description: Firmware Target's Top Level
 -------------------------------------------------------------------------------
@@ -414,23 +414,23 @@ begin
          axilWriteMaster => axilWriteMasters(4),  -- [in]
          axilWriteSlave  => axilWriteSlaves(4),   -- [out]
          i2ci            => tempI2cIn,            -- [inout]
-         i2co            => tempIi2cOut,          -- [inout]
+         i2co            => tempI2cOut,           -- [inout]
          StartConv       => startConv,            -- [in]
          SA56004ComFault => open);                -- [out]
 
    TEMP_SDA_IOBUFT : IOBUF
       port map (
-         I  => tempI2cOut(i).sda,
-         O  => tempI2cIn(i).sda,
-         IO => tempSda(i),
-         T  => tempI2cOut(i).sdaoen);
+         I  => tempI2cOut.sda,
+         O  => tempI2cIn.sda,
+         IO => tempSda,
+         T  => tempI2cOut.sdaoen);
 
    TEMP_SCL_IOBUFT : IOBUF
       port map (
-         I  => tempI2cOut(i).scl,
-         O  => tempI2cIn(i).scl,
-         IO => tempScl(i),
-         T  => tempI2cOut(i).scloen);
+         I  => tempI2cOut.scl,
+         O  => tempI2cIn.scl,
+         IO => tempScl,
+         T  => tempI2cOut.scloen);
 
 
 end top_level;

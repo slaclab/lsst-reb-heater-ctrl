@@ -145,9 +145,9 @@ begin
       if (r.syncCount = 499) then
          v.clkDivRst    := (others => '0');
          v.alignChannel := (others => '0');
-         v.syncCount := (others => '0');
-      end if;         
-      
+         v.syncCount    := (others => '0');
+      end if;
+
 
       for i in 0 to 11 loop
          if (preFall(i) = '1') then
@@ -182,7 +182,23 @@ begin
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 0, r.highCount(i));
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 9, r.lowCount(i));
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 18, r.delayCount(i));
+
+         -- Don't allow frequencies above 2 MHz
+         if (v.highCountTmp(i) + v.lowCountTmp(i) < 98) then
+            v.highCountTmp(i)    := r.highCountTmp(i);
+            v.lowCountTmp(i)     := r.lowCountTmp(i);
+            v.axilWriteSlave.bresp := AXI_RESP_SLVERR_C;
+         end if;
+
+         -- Don't allow frequencies below 400kHz
+         if (v.highCountTmp(i) + v.lowCountTmp(i) > 498) then
+            v.highCountTmp(i)    := r.highCountTmp(i);
+            v.lowCountTmp(i)     := r.lowCountTmp(i);
+            v.axilWriteSlave.bresp := AXI_RESP_SLVERR_C;
+         end if;
       end loop;
+
+
 
       -- Use this to set multiple channels to a common phase alignment reference
       axiSlaveRegister(axilEp, toSlv(12*8, 8), 0, v.alignChannel);

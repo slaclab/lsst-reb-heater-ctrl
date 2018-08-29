@@ -150,19 +150,19 @@ begin
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 9, r.lowCount(i));
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 18, r.delayCount(i));
 
---          -- Don't allow frequencies above 2 MHz
---          if (v.highCountTmp(i) + v.lowCountTmp(i) < 98) then
---             v.highCountTmp(i)      := r.highCountTmp(i);
---             v.lowCountTmp(i)       := r.lowCountTmp(i);
---             v.axilWriteSlave.bresp := AXI_RESP_SLVERR_C;
---          end if;
+         -- Don't allow frequencies above 2 MHz
+         if (v.highCountTmp(i) + v.lowCountTmp(i) < 98) then
+            v.highCountTmp(i)      := r.highCountTmp(i);
+            v.lowCountTmp(i)       := r.lowCountTmp(i);
+            v.axilWriteSlave.bresp := AXI_RESP_SLVERR_C;
+         end if;
 
---          -- Don't allow frequencies below 400kHz
---          if (v.highCountTmp(i) + v.lowCountTmp(i) > 498) then
---             v.highCountTmp(i)      := r.highCountTmp(i);
---             v.lowCountTmp(i)       := r.lowCountTmp(i);
---             v.axilWriteSlave.bresp := AXI_RESP_SLVERR_C;
---          end if;
+         -- Don't allow frequencies below 400kHz
+         if (v.highCountTmp(i) + v.lowCountTmp(i) > 498) then
+            v.highCountTmp(i)      := r.highCountTmp(i);
+            v.lowCountTmp(i)       := r.lowCountTmp(i);
+            v.axilWriteSlave.bresp := AXI_RESP_SLVERR_C;
+         end if;
       end loop;
 
 
@@ -177,17 +177,17 @@ begin
          if (preFall(i) = '1') then
             -- Bounds check. Reset tmps back to last good values if out of bounds
             -- Don't allow frequencies over 2MHz or under 400kHz
-            if (r.highCountTmp(i) + r.lowCountTmp(i) < 98) or
-               (r.highCountTmp(i) + r.lowCountTmp(i) > 498) then
-               v.highCountTmp(i) := r.highCount(i);
-               v.lowCountTmp(i)  := r.lowCount(i);
-            else
+--             if (r.highCountTmp(i) + r.lowCountTmp(i) < 98) or
+--                (r.highCountTmp(i) + r.lowCountTmp(i) > 498) then
+--                v.highCountTmp(i) := r.highCount(i);
+--                v.lowCountTmp(i)  := r.lowCount(i);
+--             else
                -- Assign tmps to pwm inputs
                v.highCount(i)  := r.highCountTmp(i);
                v.lowCount(i)   := r.lowCountTmp(i);
                v.delayCount(i) := r.delayCountTmp(i);
                v.outputEn(i)   := r.outputEnTmp(i);
-            end if;
+           -- end if;
          end if;
       end loop;
 

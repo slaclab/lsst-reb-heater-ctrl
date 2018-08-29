@@ -126,24 +126,6 @@ begin
       end if;
 
 
-      for i in 0 to 11 loop
-         if (preFall(i) = '1') then
-            -- Bounds check. Reset tmps back to last good values if out of bounds
-            -- Don't allow frequencies over 2MHz or under 400kHz
-            if (r.highCountTmp(i) + r.lowCountTmp(i) < 98) or
-               (r.highCountTmp(i) + r.lowCountTmp(i) > 498) then
-               v.highCountTmp(i) := r.highCount(i);
-               v.lowCountTmp(i)  := r.lowCount(i);
-            else
-               -- Assign tmps to pwm inputs
-               v.highCount(i)  := r.highCountTmp(i);
-               v.lowCount(i)   := r.lowCountTmp(i);
-               v.delayCount(i) := r.delayCountTmp(i);
-               v.outputEn(i)   := r.outputEnTmp(i);
-            end if;
-         end if;
-      end loop;
-
       -- Keep pwms off by holding in resent when outputEn = 0
 --       for i in 0 to 11 loop
 --          if (r.outputEn(i) = '0') then
@@ -190,6 +172,24 @@ begin
 
       axiSlaveDefault(axilEp, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
       ----------------------------------------------------------------------------------------------
+
+      for i in 0 to 11 loop
+         if (preFall(i) = '1') then
+            -- Bounds check. Reset tmps back to last good values if out of bounds
+            -- Don't allow frequencies over 2MHz or under 400kHz
+            if (r.highCountTmp(i) + r.lowCountTmp(i) < 98) or
+               (r.highCountTmp(i) + r.lowCountTmp(i) > 498) then
+               v.highCountTmp(i) := r.highCount(i);
+               v.lowCountTmp(i)  := r.lowCount(i);
+            else
+               -- Assign tmps to pwm inputs
+               v.highCount(i)  := r.highCountTmp(i);
+               v.lowCount(i)   := r.lowCountTmp(i);
+               v.delayCount(i) := r.delayCountTmp(i);
+               v.outputEn(i)   := r.outputEnTmp(i);
+            end if;
+         end if;
+      end loop;
 
       if (rst200 = '1') then
          v := REG_INIT_C;

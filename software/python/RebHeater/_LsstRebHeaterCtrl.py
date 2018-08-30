@@ -26,6 +26,7 @@ class RebHeaterPwmChannel(pr.Device):
             bitOffset = 0,
             bitSize = 9,
             base = pr.UInt,
+            value = 249,
             disp = '{:d}'))
 
         self.add(pr.RemoteVariable(
@@ -35,6 +36,7 @@ class RebHeaterPwmChannel(pr.Device):
             bitOffset = 9,
             bitSize = 9,
             base = pr.UInt,
+            value = 249,
             disp = '{:d}'))
 
         self.add(pr.RemoteVariable(
@@ -127,7 +129,7 @@ class RebPwmCtrl(pr.Device):
         for i in range(12):
             self.add(RebHeaterPwmChannel(
                 name = f'Channel[{i}]',
-                enabled = True,
+                enabled = False,
                 offset = i*8))
 
         self.add(pr.RemoteCommand(
@@ -218,7 +220,26 @@ class LambdaIO(pr.Device):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         for i in range(6):
-            self.add(LambdaChannel(offset = i*4))
+            self.add(LambdaChannel(
+                name = f'Channel[{i}]',
+                offset = i*4))
+
+class Interlocks(pr.Device):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.add(pr.RemoteVariable(
+            name = "CryoEn",
+            offset = 0,
+            bitOffset = 0,
+            bitSize = 1,
+            base = pr.Bool))
+        
+        self.add(pr.RemoteVariable(
+            name = "ColdplateEn",
+            offset = 0,
+            bitOffset = 1,
+            bitSize = 1,
+            base = pr.Bool))
 
         
 class LsstRebHeaterCtrl(pr.Device):
@@ -227,30 +248,48 @@ class LsstRebHeaterCtrl(pr.Device):
 
         self.add(lsst.LsstPwrCtrlCore())
 
+        self.add(Interlocks(
+            offset = lsst.AXIL_OFFSETS[3]))
+
         self.add(RebPwmCtrl(
-            hidden = True,
+            hidden = False,
+            enabled = False,
             offset = lsst.AXIL_OFFSETS[0]))
 
+        self.add(pr.Device(
+            name = 'HeaterADCs',
+            offset = lsst.AXIL_OFFSETS[1]))
+        
         for i in range(12):
-            self.add(i2c.Ltc2945(
+            self.HeaterADCs.add(i2c.Ltc2945(
                 name = f'Ltc2945[{i}]',
-                enabled = True,
-                hidden = True,
-                offset = lsst.AXIL_OFFSETS[1] + (i * 0x1000),
+                enabled = False,
+                hidden = False,
+                offset = (i * 0x1000),
                 shunt = 0.02
             ))
-            
+
+        self.add(pr.Device(name='RebHeaterChannels'))
         for i in range(12):
-            self.add(RebHeaterCtrlChannel(
+            self.RebHeaterChannels.add(RebHeaterCtrlChannel(
                 name = f'RebHeaterChannel[{i}]',
                 pwm = self.RebPwmCtrl.Channel[i],
-                ltc2945 = self.Ltc2945[i]))
+                ltc2945 = self.HeaterADCs.Ltc2945[i]))
+
+        for i in range(6):
+            self.add(i2c.LambdaSupply(
+                name = f'LambdaSupply[{i}]',
+                offset = lsst.AXIL_OFFSETS[2]+(i*1000)))
+        #self.add(LambdaIO(
+        #    offset = lsst.AXIL_OFFSETS[2]+0x6000))
 
         
 class LsstRebHeaterCtrlRoot(lsst.LsstPwrCtrlRoot):
     def __init__(self, pollEn=False, **kwargs):
         super().__init__(**kwargs)
 
+        print(kwargs)
+        
         self.add(LsstRebHeaterCtrl(
             memBase = self.srp))
 

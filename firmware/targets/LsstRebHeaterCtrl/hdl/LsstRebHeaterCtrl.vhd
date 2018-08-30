@@ -2,7 +2,7 @@
 -- File       : LsstRebHeaterCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-04-05
--- Last update: 2018-08-28
+-- Last update: 2018-08-30
 -------------------------------------------------------------------------------
 -- Description: Firmware Target's Top Level
 -------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ begin
          vPIn             => vPIn,
          vNIn             => vNIn,
          -- Eth config
-         overrideEthCofig => '1',
+         overrideEthCofig => '0',
          overrideMacAddr  => X"01_00_16_56_00_08",
          overrideIpAddr   => X"0B_01_A8_C0",
          -- Boot Memory Ports

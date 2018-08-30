@@ -44,15 +44,15 @@ end entity LambdaIO;
 architecture rtl of LambdaIO is
 
    type RegType is record
-      lambdaRemoteOnL : slv(5 downto 0);
-      axilReadSlave   : AxiLiteReadSlaveType;
-      axilWriteSlave  : AxiLiteWriteSlaveType;
+      lambdaRemoteOn : slv(5 downto 0);
+      axilReadSlave  : AxiLiteReadSlaveType;
+      axilWriteSlave : AxiLiteWriteSlaveType;
    end record RegType;
 
    constant REG_INIT_C : RegType := (
-      lambdaRemoteOnL => (others => '1'),
-      axilReadSlave   => AXI_LITE_READ_SLAVE_INIT_C,
-      axilWriteSlave  => AXI_LITE_WRITE_SLAVE_INIT_C);
+      lambdaRemoteOn => (others => '0'),
+      axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
+      axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
@@ -71,7 +71,7 @@ begin
       axiSlaveWaitTxn(ep, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
       for i in 0 to 5 loop
-         axiSlaveRegister(ep, toSlv(i*4, 8), 0, v.lambdaRemoteOnL(i));
+         axiSlaveRegister(ep, toSlv(i*4, 8), 0, v.lambdaRemoteOn(i));
          axiSlaveRegisterR(ep, toSlv(i*4, 8), 1, lambdaEnabled(i));
          axiSlaveRegisterR(ep, toSlv(i*4, 8), 2, lambdaAcOk(i));
          axiSlaveRegisterR(ep, toSlv(i*4, 8), 3, lambdaPwrOk(i));
@@ -90,9 +90,9 @@ begin
       rin <= v;
 
       -- Outputs
-      axilReadSlave    <= r.axilReadSlave;
-      axilWriteSlave   <= r.axilWriteSlave;
-      lambdaRemoteOnL <= r.lambdaRemoteOnL;
+      axilReadSlave   <= r.axilReadSlave;
+      axilWriteSlave  <= r.axilWriteSlave;
+      lambdaRemoteOnL <= not r.lambdaRemoteOn;
    end process;
 
    seq : process (axilClk) is

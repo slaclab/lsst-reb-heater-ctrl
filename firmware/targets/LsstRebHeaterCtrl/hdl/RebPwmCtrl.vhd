@@ -36,6 +36,8 @@ entity RebPwmCtrl is
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
 
+      cryoEn : in sl;
+      coldplateEn : in sl;
       outputEn : out slv(11 downto 0);
       pwm      : out slv(11 downto 0));
 
@@ -150,6 +152,15 @@ begin
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 9, r.lowCount(i));
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 18, r.delayCount(i));
 
+         -- Interlocks override outputEn
+         if (i>=0 and i <=5) and cryoEn = '0' then
+            v.outputEnTmp(i) := '0';
+         end if;
+
+         if ((i >=6 and i <= 11) and coldplateEn = '0') then
+            v.outputEnTmp(i) := '0';
+         end if;
+
 --          -- Don't allow frequencies above 2 MHz
 --          if (v.highCountTmp(i) + v.lowCountTmp(i) < 98) then
 --             v.highCountTmp(i)      := r.highCountTmp(i);
@@ -165,6 +176,9 @@ begin
 --          end if;
       end loop;
 
+      if (interlockEn = '0') then
+         v.outputEnTmp
+      end if;
 
 
       -- Use this to set multiple channels to a common phase alignment reference

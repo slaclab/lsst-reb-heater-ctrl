@@ -128,9 +128,16 @@ architecture top_level of LsstRebHeaterCtrl is
    signal tempI2cIn  : i2c_in_type;
    signal tempI2cOut : i2c_out_type;
 
-
+   -------------------------------------------------------------------------------------------------
+   -- Interlocks
+   -------------------------------------------------------------------------------------------------
+   signal cryoEn      : sl;
+   signal coldplateEn : sl;
 
 begin
+
+   cryoEn      <= not cryoEnL;
+   coldplateEn <= not coldplateEnL;
 
    ---------------------
    -- Common Core Module
@@ -225,6 +232,8 @@ begin
          axilReadSlave   => heaterAxilReadSlave,    -- [in]
          axilWriteMaster => heaterAxilWriteMaster,  -- [out]
          axilWriteSlave  => heaterAxilWriteSlave,   -- [in]
+         cryoEn          => cryoEn,                 -- [in]
+         coldplateEn     => coldplateEn,            -- [in]
          outputEn        => rebOutputEn,            -- [out]
          pwm             => rebPwm);                -- [out]
 
@@ -396,8 +405,8 @@ begin
          axiReadSlave                 => axilReadSlaves(3),    -- [out]
          axiWriteMaster               => axilWriteMasters(3),  -- [in]
          axiWriteSlave                => axilWriteSlaves(3),   -- [out]
-         readRegister(0)(0)           => cryoEnL,              -- [in]
-         readRegister(0)(1)           => coldplateEnL,         -- [in]
+         readRegister(0)(0)           => cryoEn,               -- [in]
+         readRegister(0)(1)           => coldplateEn,          -- [in]
          readRegister(0)(31 downto 2) => (others => '0'));     -- [in]
 
    -------------------------------------------------------------------------------------------------

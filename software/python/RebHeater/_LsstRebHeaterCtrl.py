@@ -182,7 +182,7 @@ class LambdaChannel(pr.Device):
             offset = 0,
             bitOffset = 0,
             bitSize = 1,
-            enum = {1: 'False', 0: 'True'})) # Active Low
+            base = pr.Bool))
             
         self.add(pr.RemoteVariable(
             name = 'Enabled',
@@ -190,7 +190,7 @@ class LambdaChannel(pr.Device):
             offset = 0,
             bitOffset = 1,
             bitSize = 1,
-            base = pr.Bool))
+            enum = {1: 'False', 0: 'True'}))
 
         self.add(pr.RemoteVariable(
             name = 'AcOk',
@@ -198,7 +198,7 @@ class LambdaChannel(pr.Device):
             offset = 0,
             bitOffset = 2,
             bitSize = 1,
-            base = pr.Bool))
+            enum = {1: 'False', 0: 'True'}))
 
         self.add(pr.RemoteVariable(
             name = 'PwrOk',
@@ -206,7 +206,7 @@ class LambdaChannel(pr.Device):
             offset = 0,
             bitOffset = 3,
             bitSize = 1,
-            base = pr.Bool))
+            enum = {1: 'False', 0: 'True'}))
 
         self.add(pr.RemoteVariable(
             name = 'Otw',
@@ -214,7 +214,7 @@ class LambdaChannel(pr.Device):
             offset = 0,
             bitOffset = 4,
             bitSize = 1,
-            base = pr.Bool))
+            enum = {1: 'False', 0: 'True'}))
         
 class LambdaIO(pr.Device):
     def __init__(self, **kwargs):
@@ -276,12 +276,17 @@ class LsstRebHeaterCtrl(pr.Device):
                 pwm = self.RebPwmCtrl.Channel[i],
                 ltc2945 = self.HeaterADCs.Ltc2945[i]))
 
+        self.add(pr.Device(
+            name='LambdaSupplies',
+            offset = lsst.AXIL_OFFSETS[2]))
         for i in range(6):
-            self.add(i2c.LambdaSupply(
+            self.LambdaSupplies.add(i2c.LambdaSupply(
                 name = f'LambdaSupply[{i}]',
-                offset = lsst.AXIL_OFFSETS[2]+(i*1000)))
-        #self.add(LambdaIO(
-        #    offset = lsst.AXIL_OFFSETS[2]+0x6000))
+                enabled = False,
+                offset = (i*0x1000)))
+            
+        self.add(LambdaIO(
+            offset = lsst.AXIL_OFFSETS[2]+0x6000))
 
         
 class LsstRebHeaterCtrlRoot(lsst.LsstPwrCtrlRoot):

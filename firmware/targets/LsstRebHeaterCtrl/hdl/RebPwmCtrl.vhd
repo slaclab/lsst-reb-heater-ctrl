@@ -102,7 +102,7 @@ begin
             preFall    => preFall(i));      -- [out]
    end generate PWM_GEN;
 
-   comb : process (axilReadMaster, axilWriteMaster, preFall, r, rst200) is
+   comb : process (axilReadMaster, axilWriteMaster, coldplateEn, cryoEn, preFall, r, rst200) is
       variable v      : RegType;
       variable axilEp : AxiLiteEndpointType;
    begin

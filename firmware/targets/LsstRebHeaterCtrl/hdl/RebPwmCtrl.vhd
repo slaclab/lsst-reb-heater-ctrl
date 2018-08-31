@@ -151,7 +151,7 @@ begin
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 0, r.highCount(i));
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 9, r.lowCount(i));
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 18, r.delayCount(i));
-
+ 
          -- Interlocks override outputEn
          if (i>=0 and i <=5) and cryoEn = '0' then
             v.outputEnTmp(i) := '0';
@@ -175,10 +175,6 @@ begin
 --             v.axilWriteSlave.bresp := AXI_RESP_SLVERR_C;
 --          end if;
       end loop;
-
-      if (interlockEn = '0') then
-         v.outputEnTmp
-      end if;
 
 
       -- Use this to set multiple channels to a common phase alignment reference

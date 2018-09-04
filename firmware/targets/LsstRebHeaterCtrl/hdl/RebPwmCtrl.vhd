@@ -36,10 +36,10 @@ entity RebPwmCtrl is
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
 
-      cryoEn : in sl;
-      coldplateEn : in sl;
-      outputEn : out slv(11 downto 0);
-      pwm      : out slv(11 downto 0));
+      cryoEn      : in  sl;
+      coldplateEn : in  sl;
+      outputEn    : out slv(11 downto 0);
+      pwm         : out slv(11 downto 0));
 
 end entity RebPwmCtrl;
 
@@ -151,13 +151,13 @@ begin
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 0, r.highCount(i));
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 9, r.lowCount(i));
          axiSlaveRegisterR(axilEp, toSlv((i*8)+4, 8), 18, r.delayCount(i));
- 
+
          -- Interlocks override outputEn
-         if (i>=0 and i <=5) and cryoEn = '0' then
+         if (i >= 0 and i <= 5) and cryoEn = '0' then
             v.outputEnTmp(i) := '0';
          end if;
 
-         if ((i >=6 and i <= 11) and coldplateEn = '0') then
+         if ((i >= 6 and i <= 11) and coldplateEn = '0') then
             v.outputEnTmp(i) := '0';
          end if;
 
@@ -188,7 +188,8 @@ begin
             -- Bounds check. Reset tmps back to last good values if out of bounds
             -- Don't allow frequencies over 2MHz or under 400kHz
             if (r.highCountTmp(i) + r.lowCountTmp(i) < 98) or
-               (r.highCountTmp(i) + r.lowCountTmp(i) > 498) then
+               (r.highCountTmp(i) + r.lowCountTmp(i) > 498) or
+               (r.highCountTmp(i) = 0) or (r.lowCountTmp(i) = 0) then
                v.highCountTmp(i) := r.highCount(i);
                v.lowCountTmp(i)  := r.lowCount(i);
             else

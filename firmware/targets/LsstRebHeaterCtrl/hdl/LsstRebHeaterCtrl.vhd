@@ -2,7 +2,7 @@
 -- File       : LsstRebHeaterCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-04-05
--- Last update: 2018-08-30
+-- Last update: 2018-09-06
 -------------------------------------------------------------------------------
 -- Description: Firmware Target's Top Level
 -------------------------------------------------------------------------------
@@ -416,7 +416,7 @@ begin
       generic map (
          TPD_G                         => TPD_G,
          DEVICE_MAP_G                  => (0 =>
-                          (i2cAddress  => "0001010000",
+                          (i2cAddress  => "0001001000",
                            i2cTenbit   => '0',
                            dataSize    => 8,
                            addrSize    => 8,

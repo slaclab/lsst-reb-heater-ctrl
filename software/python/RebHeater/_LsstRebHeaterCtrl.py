@@ -1,6 +1,8 @@
 import rogue
 import pyrogue as pr
 
+import surf.devices.nxp as nxp
+
 import LsstPwrCtrlCore as lsst
 import LsstPwrCtrlCore.i2c as i2c
 
@@ -287,6 +289,11 @@ class LsstRebHeaterCtrl(pr.Device):
             
         self.add(LambdaIO(
             offset = lsst.AXIL_OFFSETS[2]+0x6000))
+
+        self.add(nxp.Sa56004x(
+            description = "Board temperature monitor",
+            offset = lsst.AXIL_OFFSETS[4],
+            enabled = False))
 
         
 class LsstRebHeaterCtrlRoot(lsst.LsstPwrCtrlRoot):

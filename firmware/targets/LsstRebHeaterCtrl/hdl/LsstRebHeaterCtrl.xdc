@@ -124,8 +124,8 @@ set_property -dict { PACKAGE_PIN D22  IOSTANDARD LVCMOS33}  [get_ports { lambdaO
 set_property -dict { PACKAGE_PIN H19  IOSTANDARD LVCMOS33}  [get_ports { lambdaRemoteOnL[0] }]
 set_property -dict { PACKAGE_PIN K18  IOSTANDARD LVCMOS33}  [get_ports { lambdaRemoteOnL[1] }]
 set_property -dict { PACKAGE_PIN K19  IOSTANDARD LVCMOS33}  [get_ports { lambdaRemoteOnL[2] }]
-set_property -dict { PACKAGE_PIN L19  IOSTANDARD LVCMOS33}  [get_ports { lambdaRemoteOnL[3] }]
-set_property -dict { PACKAGE_PIN L20  IOSTANDARD LVCMOS33}  [get_ports { lambdaRemoteOnL[4] }]
+set_property -dict { PACKAGE_PIN L20  IOSTANDARD LVCMOS33}  [get_ports { lambdaRemoteOnL[3] }]
+set_property -dict { PACKAGE_PIN L19  IOSTANDARD LVCMOS33}  [get_ports { lambdaRemoteOnL[4] }]
 set_property -dict { PACKAGE_PIN N22  IOSTANDARD LVCMOS33}  [get_ports { lambdaRemoteOnL[5] }]
 
 set_property -dict { PACKAGE_PIN M18  IOSTANDARD LVCMOS33}  [get_ports { lambdaSda[0] }]

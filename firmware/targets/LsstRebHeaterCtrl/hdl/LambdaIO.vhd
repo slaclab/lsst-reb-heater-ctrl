@@ -61,8 +61,7 @@ architecture rtl of LambdaIO is
 
 begin
 
-   comb : process (axilReadMaster, axilRst, axilWriteMaster, lambdaAcOk, lambdaEnabled, lambdaOtw,
-                   lambdaPwrOk, r) is
+   comb : process (axilReadMaster, axilRst, axilWriteMaster, coldplateEn, cryoEn, lambdaAcOk, lambdaEnabled, lambdaOtw, lambdaPwrOk, r) is
       variable v  : RegType;
       variable ep : AxiLiteEndPointType;
    begin

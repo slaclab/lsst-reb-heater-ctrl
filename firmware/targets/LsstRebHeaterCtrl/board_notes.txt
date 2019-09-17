@@ -1,0 +1,47 @@
+Main 24V fuse is .25A. Board draws .24A with FPGA loaded.
+ - Need .5A fuse
+
+0x00000000
+ - RebPwmCtrl
+
+0x00040000
+ - 0x00040000
+   - Ltc2945[0]
+ - 0x00041000
+   - Ltc2945[1]
+ ... Ltc2945[11]
+ 
+0x00080000
+ - 0x00080000
+   - Lambda 0
+ - 0x00081000
+   - Lambda 1
+ - 0x00082000
+   - Lambda 2
+ ..- Lambda 5
+ 
+ - 0x00086000
+   - LambdaIO
+
+- 0x000C0000
+   - Interlocks
+
+- 0x00100000
+    - SA56004 Temperature
+
+- 0x001C0000
+  - 0x001C0000
+    - AxiVersion
+  - 0x001C0400
+    - 0x001C0400  
+      - LSST_PWR_CORE_VERSION_C
+    - 0x001C0404
+      - BOARD_ID
+    - 0x001C0408
+      - NUM_LANES
+    
+- 0x00200000
+  - XADC
+
+- 0x00240000
+  - N25Q

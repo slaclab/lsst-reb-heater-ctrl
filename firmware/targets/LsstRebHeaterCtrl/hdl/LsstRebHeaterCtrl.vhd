@@ -2,7 +2,7 @@
 -- File       : LsstRebHeaterCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-04-05
--- Last update: 2018-09-06
+-- Last update: 2019-09-17
 -------------------------------------------------------------------------------
 -- Description: Firmware Target's Top Level
 -------------------------------------------------------------------------------
@@ -384,6 +384,8 @@ begin
          axilReadSlave   => lambdaAxilReadSlaves(6),    -- [out]
          axilWriteMaster => lambdaAxilWriteMasters(6),  -- [in]
          axilWriteSlave  => lambdaAxilWriteSlaves(6),   -- [out]
+         cryoEn          => cryoEn,                     -- [in]
+         coldplateEn     => coldplateEn,                -- [in]
          lambdaEnabled   => lambdaEnabled,              -- [in]
          lambdaAcOk      => lambdaAcOk,                 -- [in]
          lambdaPwrOk     => lambdaPwrOk,                -- [in]

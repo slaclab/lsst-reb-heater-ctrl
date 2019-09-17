@@ -34,6 +34,8 @@ entity LambdaIO is
       axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
+      cryoEn : in sl;
+      coldplateEn : in sl;
       lambdaEnabled   : in  slv(5 downto 0);
       lambdaAcOk      : in  slv(5 downto 0);
       lambdaPwrOk     : in  slv(5 downto 0);
@@ -80,6 +82,10 @@ begin
 
       -- Closeout the transaction
       axiSlaveDefault(ep, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
+
+      if (cryoEn = '0' or coldplateEn = '0') then
+         v.lambdaRemoteOn(0) := '0';
+      end if;
 
       -- Synchronous Reset
       if (axilRst = '1') then

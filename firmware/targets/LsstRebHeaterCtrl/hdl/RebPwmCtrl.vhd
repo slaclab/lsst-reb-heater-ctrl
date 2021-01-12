@@ -20,8 +20,9 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity RebPwmCtrl is
 
@@ -87,7 +88,7 @@ architecture rtl of RebPwmCtrl is
 begin
 
    PWM_GEN : for i in 11 downto 0 generate
-      U_ClockDivider_1 : entity work.ClockDivider
+      U_ClockDivider_1 : entity surf.ClockDivider
          generic map (
             TPD_G         => TPD_G,
             COUNT_WIDTH_G => 9)

@@ -18,9 +18,12 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.I2cPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.I2cPkg.all;
+
+library lsst_pwr_ctrl_core;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -142,7 +145,7 @@ begin
    ---------------------
    -- Common Core Module
    ---------------------
-   U_Core : entity work.LsstPwrCtrlCore
+   U_Core : entity lsst_pwr_ctrl_core.LsstPwrCtrlCore
       generic map (
          TPD_G             => TPD_G,
          SIMULATION_G      => SIMULATION_G,
@@ -184,7 +187,7 @@ begin
    -- PWM
    -------------------------------------------------------------------------------------------------
    -- Create 200 MHz clock for PWM base
-   U_ClockManager7_1 : entity work.ClockManager7
+   U_ClockManager7_1 : entity surf.ClockManager7
       generic map (
          TPD_G              => TPD_G,
          TYPE_G             => "MMCM",
@@ -203,7 +206,7 @@ begin
          rstOut(0) => rst200);          -- [out]
 
    -- Bring AXIL onto clk200
-   U_AxiLiteAsync_1 : entity work.AxiLiteAsync
+   U_AxiLiteAsync_1 : entity surf.AxiLiteAsync
       generic map (
          TPD_G => TPD_G)
 --         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
@@ -242,7 +245,7 @@ begin
    -- AXIL CH 1
    -- LTC2945
    -------------------------------------------------------------------------------------------------
-   U_REB_Xbar : entity work.AxiLiteCrossbar
+   U_REB_Xbar : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -260,7 +263,7 @@ begin
          mAxiReadMasters     => ltc2945AxilReadMasters,
          mAxiReadSlaves      => ltc2945AxilReadSlaves);
 
-   U_StartConv : entity work.Heartbeat
+   U_StartConv : entity surf.Heartbeat
       generic map(
          TPD_G        => 1 ns,
          PERIOD_IN_G  => 8.0E-9,                             --units of seconds
@@ -289,7 +292,7 @@ begin
 --             sda            => ltc2945Sda(i));
 
 
-      U_LTC2945Axil_1 : entity work.LTC2945Axil
+      U_LTC2945Axil_1 : entity lsst_pwr_ctrl_core.LTC2945Axil
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -324,7 +327,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Lambda PS monitoring on ch 2
    -------------------------------------------------------------------------------------------------
-   U_LAMBDA_XBAR : entity work.AxiLiteCrossbar
+   U_LAMBDA_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -343,7 +346,7 @@ begin
          mAxiReadSlaves      => lambdaAxilReadSlaves);
 
    LAMBDA_GEN : for i in 5 downto 0 generate
-      U_LambdaAxil_1 : entity work.LambdaAxil
+      U_LambdaAxil_1 : entity lsst_pwr_ctrl_core.LambdaAxil
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -395,7 +398,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Interlocks on ch 3
    -------------------------------------------------------------------------------------------------
-   U_AxiLiteRegs_1 : entity work.AxiLiteRegs
+   U_AxiLiteRegs_1 : entity surf.AxiLiteRegs
       generic map (
          TPD_G           => TPD_G,
          NUM_WRITE_REG_G => 1,
@@ -414,7 +417,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Temperature on ch 4
    -------------------------------------------------------------------------------------------------
-   U_AxiI2cRegMaster_1 : entity work.AxiI2cRegMaster
+   U_AxiI2cRegMaster_1 : entity surf.AxiI2cRegMaster
       generic map (
          TPD_G                         => TPD_G,
          DEVICE_MAP_G                  => (0 =>

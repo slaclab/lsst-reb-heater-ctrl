@@ -18,7 +18,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
 
 ----------------------------------------------------------------------------------------------------
 
@@ -102,7 +103,7 @@ begin
          coldplateEnL    => coldplateEnL);    -- [in]
 
    
-   U_ClkRst_1 : entity work.ClkRst
+   U_ClkRst_1 : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => 8 ns,
          CLK_DELAY_G       => 1 ns,

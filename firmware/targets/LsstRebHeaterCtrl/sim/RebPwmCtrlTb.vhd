@@ -18,8 +18,9 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 ----------------------------------------------------------------------------------------------------
 
@@ -61,7 +62,7 @@ begin
          pwm             => pwm);             -- [out]
 
 
-   U_ClkRst_1 : entity work.ClkRst
+   U_ClkRst_1 : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => 5 ns,
          CLK_DELAY_G       => 1 ns,
